@@ -1,0 +1,59 @@
+name: Continuous Deployment
+
+on:
+  push:
+    branches:
+      - main
+
+# Remember to set the following secrets in your repository's settings:
+# https://github.com/your_username/itu-minitwit-ci/settings/secrets/actions
+# DOCKER_USERNAME
+# DOCKER_PASSWORD
+# SSH_USER
+# SSH_KEY
+# SSH_HOST
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push website to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          context: "{{defaultContext}}:."
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/website:latest
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/website:webbuildcache
+          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/website:webbuildcache,mode=max
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh/
+          echo "$SSH_KEY"
+          echo "$SSH_KEY" > ~/.ssh/do_ssh_key.key
+          chmod 600 ~/.ssh/do_ssh_key.key
+
+          ssh-keyscan 134.209.232.1 >> ~/.ssh/known_hosts
+          cat >> ~/.ssh/config <<END
+          Host *
+            StrictHostKeyChecking no
+            UserKnownHostsFile /dev/null
+            LogLevel ERROR
+          END
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
+
+      - name: Remove old deployment tools
+        run: ssh root@134.209.232.1 -i ~/.ssh/do_ssh_key.key 'docker stop && docker pull ${{ secrets.DOCKER_USERNAME }}/website && docker run -p 80:80 ${{ secrets.DOCKER_USERNAME }}/website -d'
+        env:
+          SSH_HOST: ${{ secrets.SSH_HOST }}
