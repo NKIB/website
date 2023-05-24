@@ -36,8 +36,6 @@ jobs:
           context: "{{defaultContext}}:."
           push: true
           tags: ${{ secrets.DOCKER_USERNAME }}/website:latest
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/website:webbuildcache
-          cache-to: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/website:webbuildcache,mode=max
 
       - name: Configure SSH
         run: |
