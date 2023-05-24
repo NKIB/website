@@ -54,6 +54,6 @@ jobs:
           SSH_KEY: ${{ secrets.SSH_KEY }}
 
       - name: Remove old deployment tools
-        run: ssh root@134.209.232.1 -i ~/.ssh/do_ssh_key.key 'docker stop && docker pull ${{ secrets.DOCKER_USERNAME }}/website && docker run -p 80:80 ${{ secrets.DOCKER_USERNAME }}/website -d'
+        run: ssh root@134.209.232.1 -i ~/.ssh/do_ssh_key.key 'docker stop website && docker pull ${{ secrets.DOCKER_USERNAME }}/website && docker run -d --name website -p 80:3000 ${{ secrets.DOCKER_USERNAME }}/website:latest'
         env:
           SSH_HOST: ${{ secrets.SSH_HOST }}

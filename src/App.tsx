@@ -46,7 +46,7 @@ export const App = () => (
 
 
     <Text marginLeft="30px">
-      Hello there... And welcome to my website. Here you will find a portefolie of my recent coding projects. Enjoy!
+      Hello there... And welcome to my website. Here you will find a portefolie of my recent coding projects. Enjoy! Test 
     </Text>
     </center>
     </Container>
