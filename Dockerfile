@@ -6,6 +6,8 @@ COPY . /build
 
 RUN npm install
 
+RUN npm install --global yarn
+
 RUN npm run build && mkdir /app && cp -r ./build /app
 
 WORKDIR /app
