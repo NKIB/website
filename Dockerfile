@@ -4,9 +4,7 @@ WORKDIR /build
 
 COPY . /build
 
-RUN npm install
-
-RUN npm install --global yarn
+RUN npm install --legacy-peer-deps
 
 RUN npm run build && mkdir /app && cp -r ./build /app
 
